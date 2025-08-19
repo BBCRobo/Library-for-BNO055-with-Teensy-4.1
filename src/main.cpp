@@ -19,6 +19,10 @@ pulled HIGH (3.3V), the address will be BNO055_ADDRESS_B.
 For the GY-BNO055, the address is always BNO055_ADDRESS_B unless other
 soldering is done to the board.
 
+For the bno.begin() function, pass the operation mode as a parameter. The 
+OPERATION_MODE_IMUPLUS uses the sensor fusion but produces a higher output rate
+when compared to other fusion modes.
+
 Please also know the added library dependencies in platformio.ini:
 lib_deps =
     adafruit/Adafruit BusIO
@@ -26,16 +30,17 @@ lib_deps =
 */
 #include <Adafruit_BNO055.h>
 
-
+// Change the address to BNO_ADDRESS_B if needed. Also change &Wire to &Wire1
+// or &Wire2 depending on which I2C bus is being used.
 Adafruit_BNO055 bno = Adafruit_BNO055(55, BNO055_ADDRESS_A, &Wire);
 
 
-void setup()
-{
-    Serial.println("Orientation Sensor Test"); Serial.println("");
+void setup() {
+    Serial.println("Orientation Sensor Test");
+    Serial.println();
 
     while(!bno.begin(OPERATION_MODE_IMUPLUS)) {
-        Serial.println("Ooops, no BNO055 detected ... Check your wiring or I2C ADDR!");
+        Serial.println("No BNO055 detected. Check your wiring or I2C ADDR.");
         delay(1000);
     }
     delay(500);
@@ -44,16 +49,15 @@ void setup()
 }
 
 
-void loop()
-{
+void loop() {
     sensors_event_t event;
     bno.getEvent(&event);
 
-    Serial.print(F("Orientation: "));
-    Serial.print((float)event.orientation.x);
-    Serial.print(F(" "));
-    Serial.print((float)event.orientation.y);
-    Serial.print(F(" "));
-    Serial.print((float)event.orientation.z);
-    Serial.println(F(""));
+    Serial.print("Orientation: ");
+    Serial.print(event.orientation.x);
+    Serial.print(" ");
+    Serial.print(event.orientation.y);
+    Serial.print(" ");
+    Serial.print(event.orientation.z);
+    Serial.println();
 }
